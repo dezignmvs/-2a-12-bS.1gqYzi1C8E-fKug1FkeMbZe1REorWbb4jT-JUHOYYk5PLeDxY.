@@ -1,562 +1,521 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Sanad Card Generator</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@200,300,400,500,600,700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Sanad Card Generator</title>
 
-    <style>
-        body { font-family: 'Clash Grotesk', sans-serif; background-color: #0f0f0f; color: #ffffff; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1a1a1a; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        .glass-panel { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .input-dark { background-color: #000; border: 1px solid #444; color: white; }
-        .analytics-table { width: 100%; border-collapse: collapse; }
-        .analytics-table th { text-align: left; padding: 1rem; color: #888; border-bottom: 1px solid #333; font-weight: 500; font-size: 0.875rem; }
-        .analytics-table td { padding: 1rem; border-bottom: 1px solid #222; vertical-align: middle; }
-        .analytics-table tr:hover { background: rgba(255,255,255,0.02); }
-        .loader { border: 2px solid #333; border-top: 2px solid #fff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@200,300,400,500,600,700&display=swap" rel="stylesheet">
+
+<style>
+body { font-family: 'Clash Grotesk', sans-serif; background-color: #0f0f0f; color: #ffffff; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #1a1a1a; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+.glass-panel { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+.input-dark { background-color: #000; border: 1px solid #444; color: white; }
+.analytics-table { width: 100%; border-collapse: collapse; }
+.analytics-table th { text-align: left; padding: 1rem; color: #888; border-bottom: 1px solid #333; font-weight: 500; font-size: 0.875rem; }
+.analytics-table td { padding: 1rem; border-bottom: 1px solid #222; vertical-align: middle; }
+.analytics-table tr:hover { background: rgba(255,255,255,0.02); }
+.loader { border: 2px solid #333; border-top: 2px solid #fff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <nav class="border-b border-gray-800 p-4 sticky top-0 bg-[#0f0f0f]/80 backdrop-blur z-50">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="text-xl font-bold tracking-wider text-white">CARD<span class="text-blue-500">ADMIN</span></div>
-            <div class="flex space-x-6 items-center">
-                <button onclick="adminApp.switchView('config')" id="nav-config" class="text-white font-medium hover:text-blue-400 transition">Configuration</button>
-                <button onclick="adminApp.switchView('analytics')" id="nav-analytics" class="text-gray-400 hover:text-blue-400 transition">Analytics</button>
-            </div>
-        </div>
-    </nav>
+<nav class="border-b border-gray-800 p-4 sticky top-0 bg-[#0f0f0f]/80 backdrop-blur z-50">
+<div class="max-w-6xl mx-auto flex justify-between items-center">
+<div class="text-xl font-bold tracking-wider text-white">SANAD<span class="text-blue-500">ADMIN</span></div>
+<div class="flex space-x-6 items-center">
+<button onclick="adminApp.switchView('config')" id="nav-config" class="text-white font-medium hover:text-blue-400 transition">Configuration</button>
+<button onclick="adminApp.switchView('analytics')" id="nav-analytics" class="text-gray-400 hover:text-blue-400 transition">Analytics</button>
+</div>
+</div>
+</nav>
 
-    <main class="flex-grow p-8 flex justify-center">
-        
-        <!-- View: Configuration -->
-        <div id="view-config" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="glass-panel p-6 rounded-2xl space-y-6 h-fit">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-blue-400">Card Setup</h2>
-                    <span id="config-status" class="text-xs text-gray-500"></span>
-                </div>
-                
-                <!-- 1. Template Upload -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-2">1. Base Template (Preset Loaded)</label>
-                    <div class="relative border-2 border-dashed border-gray-700 rounded-lg p-6 text-center hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('admin-upload').click()">
-                        <input type="file" id="admin-upload" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(this)">
-                        <p id="upload-label" class="text-sm text-gray-300">Using Preset Image. Click to change (JPG/PNG - Max 20MB)</p>
-                    </div>
-                </div>
+<main class="flex-grow p-8 flex justify-center">
 
-                <div class="space-y-4">
-                    <p class="text-sm text-gray-400 mb-2">2. Adjust Layout</p>
-                    
-                    <!-- User Photo Config -->
-                    <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                        <h3 class="font-bold mb-3 text-green-400 border-b border-gray-700 pb-2">User Photo Settings</h3>
-                        <div class="grid grid-cols-2 gap-3 mb-2">
-                            <div><label class="text-xs text-gray-500 block mb-1">X Pos (%)</label><input type="number" id="photo-x" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
-                            <div><label class="text-xs text-gray-500 block mb-1">Y Pos (%)</label><input type="number" id="photo-y" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div><label class="text-xs text-gray-500 block mb-1">Width (px)</label><input type="number" id="photo-w" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
-                            <div><label class="text-xs text-gray-500 block mb-1">Height (px)</label><input type="number" id="photo-h" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
-                        </div>
-                    </div>
+<!-- View: Configuration -->
+<div id="view-config" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="glass-panel p-6 rounded-2xl space-y-6 h-fit">
+<div class="flex justify-between items-center">
+<h2 class="text-2xl font-bold text-blue-400">Card Setup</h2>
+<span id="config-status" class="text-xs text-gray-500"></span>
+</div>
 
-                    <!-- Name Config -->
-                    <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                        <h3 class="font-bold mb-3 text-white border-b border-gray-700 pb-2">Name Settings</h3>
-                        <div class="grid grid-cols-3 gap-3">
-                            <div><label class="text-xs text-gray-500 block mb-1">X Pos (%)</label><input type="number" id="name-x" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
-                            <div><label class="text-xs text-gray-500 block mb-1">Y Pos (%)</label><input type="number" id="name-y" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
-                            <div><label class="text-xs text-gray-500 block mb-1">Size</label><input type="number" id="name-size" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
-                        </div>
-                        <div class="mt-2">
-                            <label class="text-xs text-gray-500 block mb-1">Color (Hex)</label>
-                            <input type="text" id="name-color" value="#FFFFFF" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()">
-                        </div>
-                    </div>
-                </div>
-                
-                <button onclick="adminApp.saveConfig()" id="save-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition flex justify-center items-center gap-2">
-                    Save Configuration
-                </button>
-            </div>
+<!-- 1. Template Upload -->
+<div>
+<label class="block text-sm font-medium text-gray-400 mb-2">1. Base Template (Preset Loaded)</label>
+<div class="relative border-2 border-dashed border-gray-700 rounded-lg p-6 text-center hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('admin-upload').click()">
+<input type="file" id="admin-upload" accept="image/*" class="hidden" onchange="adminApp.handleImageUpload(this)">
+<p id="upload-label" class="text-sm text-gray-300">Using Preset Image. Click to change (JPG/PNG - Max 20MB)</p>
+</div>
+</div>
 
-            <!-- Preview -->
-            <div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-start bg-black/50 min-h-[500px]">
-                <h3 class="text-gray-400 mb-4 text-sm w-full text-center border-b border-gray-800 pb-2">Live Template Preview</h3>
-                <div class="relative w-full flex justify-center overflow-auto">
-                    <canvas id="admin-canvas" class="max-w-full h-auto shadow-2xl rounded-lg border border-gray-800"></canvas>
-                </div>
-                <p class="text-xs text-gray-500 mt-4 text-center">The green box represents where the user's photo will be placed.</p>
-            </div>
-        </div>
+<div class="space-y-4">
+<p class="text-sm text-gray-400 mb-2">2. Adjust Layout</p>
 
-        <!-- View: Analytics -->
-        <div id="view-analytics" class="w-full max-w-6xl hidden">
-            <div class="glass-panel p-8 rounded-2xl w-full">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white">Generated Cards</h2>
-                        <p class="text-gray-400 text-sm mt-1">Recent 50 generations</p>
-                    </div>
-                    <button onclick="adminApp.loadAnalytics()" class="text-sm bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded text-white transition">Refresh Data</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="analytics-table">
-                        <thead>
-                            <tr>
-                                <th>Generated At</th>
-                                <th>Name</th>
-                                <th>User Photo</th>
-                                <th>Final Card</th>
-                            </tr>
-                        </thead>
-                        <tbody id="analytics-body"><tr><td colspan="4" class="text-center text-gray-500 py-8">Loading data...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </main>
+<!-- User Photo Config -->
+<div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+<h3 class="font-bold mb-3 text-green-400 border-b border-gray-700 pb-2">User Photo Settings</h3>
+<div class="grid grid-cols-2 gap-3 mb-2">
+<div><label class="text-xs text-gray-500 block mb-1">X Pos (%)</label><input type="number" id="photo-x" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
+<div><label class="text-xs text-gray-500 block mb-1">Y Pos (%)</label><input type="number" id="photo-y" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><label class="text-xs text-gray-500 block mb-1">Width (px)</label><input type="number" id="photo-w" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
+<div><label class="text-xs text-gray-500 block mb-1">Height (px)</label><input type="number" id="photo-h" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
+</div>
+</div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        // Using stable 10.13.1 versions for compatibility with standard ES modules in browser
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, getDoc, setDoc, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+<!-- Name Config -->
+<div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+<h3 class="font-bold mb-3 text-white border-b border-gray-700 pb-2">Name Settings</h3>
+<div class="grid grid-cols-3 gap-3">
+<div><label class="text-xs text-gray-500 block mb-1">X Pos (%)</label><input type="number" id="name-x" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
+<div><label class="text-xs text-gray-500 block mb-1">Y Pos (%)</label><input type="number" id="name-y" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
+<div><label class="text-xs text-gray-500 block mb-1">Size</label><input type="number" id="name-size" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()"></div>
+</div>
+<div class="mt-2">
+<label class="text-xs text-gray-500 block mb-1">Color (Hex)</label>
+<input type="text" id="name-color" value="#FFFFFF" class="w-full p-2 rounded text-sm input-dark" oninput="adminApp.updatePreview()">
+</div>
+</div>
+</div>
 
-        // New Config Provided
-        const firebaseConfig = {
-            apiKey: "AIzaSyDEJUuNeIej1KKJ2gJKHop4ezWxv3B4CC4",
-            authDomain: "mvs-db-99118.firebaseapp.com",
-            projectId: "mvs-db-99118",
-            storageBucket: "mvs-db-99118.firebasestorage.app",
-            messagingSenderId: "525394480070",
-            appId: "1:525394480070:web:976de2685230832b2940c7",
-            measurementId: "G-EZ8WTRXK93"
-        };
+<button onclick="adminApp.saveConfig()" id="save-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition flex justify-center items-center gap-2">
+Save Configuration
+</button>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+<!-- Preview -->
+<div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-start bg-black/50 min-h-[500px]">
+<h3 class="text-gray-400 mb-4 text-sm w-full text-center border-b border-gray-800 pb-2">Live Template Preview</h3>
+<div class="relative w-full flex justify-center overflow-auto">
+<canvas id="admin-canvas" class="max-w-full h-auto shadow-2xl rounded-lg border border-gray-800"></canvas>
+</div>
+<p class="text-xs text-gray-500 mt-4 text-center">The green box represents where the user's photo will be placed.</p>
+</div>
+</div>
 
-        // Helper to ensure auth before DB ops
-        const ensureAuth = async () => {
-            if (!auth.currentUser) await signInAnonymously(auth);
-            return true;
-        };
+<!-- View: Analytics -->
+<div id="view-analytics" class="w-full max-w-6xl hidden">
+<div class="glass-panel p-8 rounded-2xl w-full">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h2 class="text-2xl font-bold text-white">Generated Cards</h2>
+<p class="text-gray-400 text-sm mt-1">Real-time database records (Collection: sanad)</p>
+</div>
+<button onclick="adminApp.loadAnalytics()" class="text-sm bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded text-white transition">Refresh Data</button>
+</div>
+<div class="overflow-x-auto">
+<table class="analytics-table">
+<thead>
+<tr>
+<th>Generated At</th>
+<th>Name</th>
+<th>User Photo</th>
+<th>Final Card</th>
+</tr>
+</thead>
+<tbody id="analytics-body"><tr><td colspan="4" class="text-center text-gray-500 py-8">Loading data...</td></tr></tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
 
-        // Expose database functions to window for the adminApp object
-        window.loadGlobalSettings = async () => {
-            if (!await ensureAuth()) return null;
-            try {
-                const docSnap = await getDoc(doc(db, "app_settings", "config"));
-                if (docSnap.exists()) return docSnap.data();
-                return null;
-            } catch (e) { console.error("Load Error:", e); return null; }
-        };
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getFirestore, collection, getDocs, getDoc, setDoc, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-        window.saveGlobalSettings = async (settingsData) => {
-            if (!await ensureAuth()) return false;
-            try {
-                // Use merge: true to avoid deleting other potential fields
-                await setDoc(doc(db, "app_settings", "config"), settingsData, { merge: true });
-                return true;
-            } catch (e) { console.error("Save Error:", e); return false; }
-        };
+// MVS Project Config
+const firebaseConfig = {
+apiKey: "AIzaSyDEJUuNeIej1KKJ2gJKHop4ezWxv3B4CC4",
+authDomain: "mvs-db-99118.firebaseapp.com",
+projectId: "mvs-db-99118",
+storageBucket: "mvs-db-99118.firebasestorage.app",
+messagingSenderId: "525394480070",
+appId: "1:525394480070:web:976de2685230832b2940c7",
+measurementId: "G-EZ8WTRXK93"
+};
 
-        window.fetchCards = async () => {
-            if (!await ensureAuth()) return { success: false, error: "Auth failed" };
-            try {
-                // Try ordering by timestamp first
-                const q = query(collection(db, "generated_cards"), orderBy("timestamp", "desc"), limit(50));
-                const querySnapshot = await getDocs(q);
-                return { success: true, data: querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) };
-            } catch (e) { 
-                // Fallback if index is missing
-                console.warn("Index missing, fetching unordered", e);
-                const q = query(collection(db, "generated_cards"), limit(50));
-                const querySnapshot = await getDocs(q);
-                return { success: true, data: querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })), warning: "Index missing" };
-            }
-        };
-    </script>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    <script>
-        const adminApp = {
-            state: {
-                currentView: 'config',
-                // Set default to your requested image
-                templateImage: "https://res.cloudinary.com/da6fjyirm/image/upload/v1768414043/rshad_esnive.png",
-                templateFile: null, // Stores raw file object
-                config: { 
-                    name: { x: 50, y: 80, size: 40, color: '#FFFFFF' }, 
-                    userPhoto: { x: 50, y: 40, width: 300, height: 300 }
-                }
-            },
-            imgObj: null,
-            // Updated Cloudinary Config
-            cloudinary: { 
-                cloudName: 'da6fjyirm', 
-                uploadPreset: 'ifadamem' 
-            },
+// Helper to ensure auth before DB ops
+const ensureAuth = async () => {
+if (auth.currentUser) return true;
+try {
+if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+try {
+await signInWithCustomToken(auth, __initial_auth_token);
+return true;
+} catch (tokenError) {
+console.warn("Custom token auth failed, falling back to anonymous:", tokenError);
+}
+}
+await signInAnonymously(auth);
+return true;
+} catch (e) {
+console.error("Auth Failure:", e);
+if (e.code === 'auth/admin-restricted-operation' || e.message.includes('admin-restricted-operation')) {
+const msg = "Firebase Error: Anonymous Auth is disabled. Please enable it in Firebase Console > Authentication > Sign-in method.";
+console.error(msg);
+alert(msg);
+document.getElementById('config-status').innerText = "Auth Error";
+document.getElementById('config-status').className = "text-xs text-red-500 font-bold";
+}
+return false;
+}
+};
 
-            async init() {
-                document.getElementById('config-status').innerText = "Connecting...";
-                
-                // Pre-load font for UI
-                try {
-                    await document.fonts.load("16px 'Clash Grotesk'");
-                } catch(e) {}
+// Expose database functions to window for the adminApp object
+window.loadGlobalSettings = async () => {
+if (!await ensureAuth()) return null;
+try {
+// DISTINCT CONFIG DOC for Sanad
+const docSnap = await getDoc(doc(db, "app_settings", "sanad_config"));
+if (docSnap.exists()) return docSnap.data();
+return null;
+} catch (e) { console.error("Load Error:", e); return null; }
+};
 
-                if (window.loadGlobalSettings) {
-                    const savedData = await window.loadGlobalSettings();
-                    if (savedData) {
-                        // Merge saved config with defaults
-                        this.state.config = { ...this.state.config, ...savedData.config };
-                        
-                        // FORCE USE OF PRESET IMAGE AS REQUESTED
-                        this.state.templateImage = "https://res.cloudinary.com/da6fjyirm/image/upload/v1768414043/rshad_esnive.png";
-                        
-                        document.getElementById('config-status').innerText = "Loaded ✓ (Preset Image Active)";
-                        this.updateInputs();
-                        this.loadAndDrawImage();
-                    } else {
-                        document.getElementById('config-status').innerText = "No settings found.";
-                        // Load the preset image even if no settings
-                        this.loadAndDrawImage();
-                    }
-                } else { 
-                    // Retry if module hasn't loaded yet
-                    setTimeout(() => this.init(), 500); 
-                }
-            },
+window.saveGlobalSettings = async (settingsData) => {
+if (!await ensureAuth()) return false;
+try {
+// DISTINCT CONFIG DOC for Sanad
+await setDoc(doc(db, "app_settings", "sanad_config"), settingsData, { merge: true });
+return true;
+} catch (e) { console.error("Save Error:", e); return false; }
+};
 
-            async saveConfig() {
-                const btn = document.getElementById('save-btn');
-                const originalText = btn.innerHTML;
-                btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Saving...';
+window.fetchCards = async () => {
+if (!await ensureAuth()) return { success: false, error: "Auth failed" };
+try {
+// DISTINCT COLLECTION: sanad
+const q = query(collection(db, "sanad"), orderBy("timestamp", "desc"), limit(50));
+const querySnapshot = await getDocs(q);
+return { success: true, data: querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) };
+} catch (e) {
+const q = query(collection(db, "sanad"), limit(50));
+const querySnapshot = await getDocs(q);
+return { success: true, data: querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })), warning: "Index missing" };
+}
+};
+</script>
 
-                if (!this.state.templateImage) {
-                    alert("Please upload a template image first.");
-                    btn.disabled = false; btn.innerHTML = originalText;
-                    return;
-                }
+<script>
+const adminApp = {
+state: {
+currentView: 'config',
+// DEFAULT TEMPLATE REQUESTED
+templateImage: "https://res.cloudinary.com/da6fjyirm/image/upload/v1768414043/rshad_esnive.png",
+templateFile: null,
+config: {
+name: { x: 50, y: 80, size: 40, color: '#FFFFFF' },
+userPhoto: { x: 50, y: 40, width: 300, height: 300 }
+}
+},
+imgObj: null,
+// UPDATED CLOUDINARY CONFIG
+cloudinary: {
+cloudName: 'da6fjyirm',
+uploadPreset: 'ifada-card' // Changed from ifadamem to ifada-card
+},
 
-                try {
-                    let finalImageUrl = this.state.templateImage;
-                    
-                    // CASE 1: New File Upload (via templateFile)
-                    if (this.state.templateFile) {
-                        const file = this.state.templateFile;
-                        
-                        try {
-                            // 1. Size Check (20MB Limit)
-                            if (file.size > 20 * 1024 * 1024) throw new Error("Image too large (max 20MB)");
+async init() {
+document.getElementById('config-status').innerText = "Connecting...";
 
-                            // 2. Upload to Cloudinary with Retry
-                            const formData = new FormData();
-                            formData.append('file', file);
-                            formData.append('upload_preset', this.cloudinary.uploadPreset.trim());
-                            const cloudName = this.cloudinary.cloudName.trim();
-                            const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-                            
-                            let res;
-                            let lastError;
-                            
-                            // Retry Logic: Try 3 times
-                            for(let attempt=0; attempt<3; attempt++) {
-                                try {
-                                    console.log(`Upload attempt ${attempt + 1}...`);
-                                    res = await fetch(uploadUrl, { method: 'POST', body: formData });
-                                    
-                                    if(res.ok) break; // Success!
-                                    
-                                    // If 4xx error (client error like bad preset), don't retry, fail immediately
-                                    if(res.status >= 400 && res.status < 500) {
-                                        const errData = await res.json();
-                                        throw new Error(errData.error?.message || "Cloudinary Client Error");
-                                    }
-                                    
-                                    throw new Error(`Server returned ${res.status}`);
-                                } catch(e) {
-                                    lastError = e;
-                                    console.warn(`Attempt ${attempt+1} failed:`, e);
-                                    // Wait 1s before retry
-                                    await new Promise(r => setTimeout(r, 1000));
-                                }
-                            }
+try {
+await document.fonts.load("16px 'Clash Grotesk'");
+} catch(e) {}
 
-                            if (!res || !res.ok) {
-                                let msg = lastError?.message || "Unknown error";
-                                if (msg.includes("Failed to fetch")) {
-                                    msg += " (Check your AdBlocker or Network Connection)";
-                                }
-                                throw new Error(`Upload failed after 3 attempts: ${msg}`);
-                            }
-                            
-                            const data = await res.json();
-                            finalImageUrl = data.secure_url;
-                            console.log("Template uploaded:", finalImageUrl);
-                            
-                            // Clear local file state
-                            this.state.templateFile = null;
+if (window.loadGlobalSettings) {
+const savedData = await window.loadGlobalSettings();
+if (savedData) {
+this.state.config = { ...this.state.config, ...savedData.config };
 
-                        } catch (uploadError) {
-                            console.warn("Cloudinary Upload Failed:", uploadError);
-                            
-                            // Fallback: If file is small (< 750KB to be safe for 1MB Firestore limit), try saving to Firestore as base64
-                            // 750KB * 1.33 (base64) ~= 1MB
-                            if (file.size < 750 * 1024) {
-                                console.log("Attempting fallback to Firestore...");
-                                finalImageUrl = await new Promise((resolve) => {
-                                    const reader = new FileReader();
-                                    reader.onload = (e) => resolve(e.target.result);
-                                    reader.readAsDataURL(file);
-                                });
-                                alert(`Cloudinary upload failed (${uploadError.message}).\n\nSaving small image directly to database instead.`);
-                            } else {
-                                throw new Error(`Cloudinary Upload Failed: ${uploadError.message}.\n\nFallback Failed: Image (${(file.size/1024/1024).toFixed(2)}MB) is too large to save directly to database (Limit 0.75MB for fallback).`);
-                            }
-                        }
-                    } 
-                    // CASE 2: Legacy Data URI (fallback for older browser states)
-                    else if (this.state.templateImage.startsWith('data:')) {
-                        // Original logic for Data URI if needed, but primary path is above
-                        const blob = await (await fetch(this.state.templateImage)).blob();
-                        const formData = new FormData();
-                        formData.append('file', blob);
-                        formData.append('upload_preset', this.cloudinary.uploadPreset.trim());
-                        const res = await fetch(`https://api.cloudinary.com/v1_1/${this.cloudinary.cloudName.trim()}/image/upload`, { method: 'POST', body: formData });
-                        const data = await res.json();
-                        finalImageUrl = data.secure_url;
-                    }
+// If a template URL exists in DB, use it, otherwise keep default
+if(savedData.templateUrl) this.state.templateImage = savedData.templateUrl;
 
-                    // CRITICAL SAFEGUARD: Never save a blob URL to database
-                    if (finalImageUrl && finalImageUrl.startsWith('blob:')) {
-                        throw new Error("Image upload failed (Internal State: Blob URL). Please try re-selecting the image.");
-                    }
+document.getElementById('config-status').innerText = "Loaded ✓";
+this.updateInputs();
+this.loadAndDrawImage();
+} else {
+document.getElementById('config-status').innerText = "No settings found. Using default.";
+this.loadAndDrawImage();
+}
+} else {
+setTimeout(() => this.init(), 500);
+}
+},
 
-                    // Save to Firestore
-                    const success = await window.saveGlobalSettings({
-                        templateUrl: finalImageUrl,
-                        config: this.state.config,
-                        lastUpdated: new Date().toISOString()
-                    });
+async saveConfig() {
+const btn = document.getElementById('save-btn');
+const originalText = btn.innerHTML;
+btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Saving...';
 
-                    if (success) {
-                        alert("Configuration Saved!");
-                        this.state.templateImage = finalImageUrl;
-                    } else { 
-                        alert("Failed to save to database."); 
-                    }
-                } catch (e) { 
-                    console.error(e);
-                    alert("Error: " + e.message); 
-                }
+if (!this.state.templateImage) {
+alert("Please upload a template image first.");
+btn.disabled = false; btn.innerHTML = originalText;
+return;
+}
 
-                btn.disabled = false; btn.innerHTML = originalText;
-            },
+try {
+let finalImageUrl = this.state.templateImage;
 
-            switchView(viewName) {
-                document.getElementById('view-config').classList.add('hidden');
-                document.getElementById('view-analytics').classList.add('hidden');
-                document.getElementById(`view-${viewName}`).classList.remove('hidden');
-                
-                // Update nav active states
-                document.getElementById('nav-config').className = viewName === 'config' ? 'text-white font-medium hover:text-blue-400 transition' : 'text-gray-400 hover:text-blue-400 transition';
-                document.getElementById('nav-analytics').className = viewName === 'analytics' ? 'text-white font-medium hover:text-blue-400 transition' : 'text-gray-400 hover:text-blue-400 transition';
+// CASE 1: New File Upload
+if (this.state.templateFile) {
+const file = this.state.templateFile;
 
-                if (viewName === 'analytics') this.loadAnalytics();
-            },
+try {
+if (file.size > 20 * 1024 * 1024) throw new Error("Image too large (max 20MB)");
 
-            async loadAnalytics() {
-                const tbody = document.getElementById('analytics-body');
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 py-8">Fetching records...</td></tr>';
-                
-                if (window.fetchCards) {
-                    const result = await window.fetchCards();
-                    if (!result.success) { 
-                        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-red-500 py-8">Error: ${result.error}</td></tr>`; 
-                        return; 
-                    }
-                    
-                    const cards = result.data;
-                    if (cards.length === 0) { 
-                        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 py-8">No records found.</td></tr>'; 
-                        return; 
-                    }
-                    
-                    tbody.innerHTML = cards.map(card => {
-                        const date = card.timestamp ? new Date(card.timestamp.seconds * 1000).toLocaleString() : 'N/A';
-                        const photoLink = card.userPhotoUrl 
-                            ? `<a href="${card.userPhotoUrl}" target="_blank" class="text-blue-400 hover:underline flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> View Photo</a>` 
-                            : '<span class="text-gray-600">No Photo</span>';
-                            
-                        return `
-                            <tr>
-                                <td class="text-gray-400 text-sm">${date}</td>
-                                <td class="font-bold text-white text-lg">${card.name}</td>
-                                <td>${photoLink}</td>
-                                <td><a href="${card.imageUrl}" target="_blank" class="px-3 py-1 bg-blue-600/20 text-blue-400 rounded border border-blue-600/30 hover:bg-blue-600 hover:text-white transition text-xs font-bold">OPEN CARD</a></td>
-                            </tr>
-                        `;
-                    }).join('');
-                }
-            },
+const formData = new FormData();
+formData.append('file', file);
+formData.append('upload_preset', this.cloudinary.uploadPreset.trim());
+const cloudName = this.cloudinary.cloudName.trim();
+const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
-            updateInputs() {
-                // Name Inputs
-                document.getElementById('name-x').value = this.state.config.name.x;
-                document.getElementById('name-y').value = this.state.config.name.y;
-                document.getElementById('name-size').value = this.state.config.name.size;
-                document.getElementById('name-color').value = this.state.config.name.color || '#FFFFFF';
+let res;
+let lastError;
 
-                // Photo Inputs
-                // Default to empty object if not set yet
-                const photo = this.state.config.userPhoto || {x:50, y:40, width:200, height:200};
-                document.getElementById('photo-x').value = photo.x;
-                document.getElementById('photo-y').value = photo.y;
-                document.getElementById('photo-w').value = photo.width;
-                document.getElementById('photo-h').value = photo.height;
-            },
+for(let attempt=0; attempt<3; attempt++) {
+try {
+console.log(`Upload attempt ${attempt + 1}...`);
+res = await fetch(uploadUrl, { method: 'POST', body: formData });
+if(res.ok) break;
+if(res.status >= 400 && res.status < 500) {
+const errData = await res.json();
+throw new Error(errData.error?.message || "Cloudinary Client Error");
+}
+throw new Error(`Server returned ${res.status}`);
+} catch(e) {
+lastError = e;
+await new Promise(r => setTimeout(r, 1000));
+}
+}
 
-            handleImageUpload(input) {
-                const file = input.files[0];
-                if (!file) return;
+if (!res || !res.ok) {
+throw new Error(`Upload failed: ${lastError?.message || "Unknown error"}`);
+}
 
-                // Revoke old URL to prevent memory leaks
-                if (this.state.templateImage && this.state.templateImage.startsWith('blob:')) {
-                    URL.revokeObjectURL(this.state.templateImage);
-                }
-                
-                // Store raw file for saveConfig
-                this.state.templateFile = file;
-                // Create efficient preview URL
-                this.state.templateImage = URL.createObjectURL(file);
-                
-                document.getElementById('upload-label').innerText = file.name;
-                this.loadAndDrawImage();
-            },
+const data = await res.json();
+finalImageUrl = data.secure_url;
+this.state.templateFile = null;
 
-            loadAndDrawImage() {
-                this.imgObj = new Image();
-                this.imgObj.crossOrigin = "Anonymous";
-                this.imgObj.src = this.state.templateImage;
-                this.imgObj.onload = () => this.updatePreview();
-                this.imgObj.onerror = () => {
-                    console.error("Could not load image. It might be a broken URL.");
-                };
-            },
+} catch (uploadError) {
+console.warn("Cloudinary Upload Failed:", uploadError);
+// Blob Fallback
+if (file.size < 750 * 1024) {
+finalImageUrl = await new Promise((resolve) => {
+const reader = new FileReader();
+reader.onload = (e) => resolve(e.target.result);
+reader.readAsDataURL(file);
+});
+alert(`Cloudinary upload failed. Saving small image directly to database.`);
+} else {
+throw new Error(`Cloudinary Upload Failed: ${uploadError.message}.`);
+}
+}
+}
+// CASE 2: Legacy Data URI check
+else if (this.state.templateImage.startsWith('data:')) {
+// Logic to handle existing base64 if needed, omitted for brevity as defaults are URLs
+}
 
-            drawPlaceholder() {
-                const canvas = document.getElementById('admin-canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = 600; canvas.height = 400;
-                ctx.fillStyle = '#1a1a1a'; ctx.fillRect(0,0, 600, 400);
-                // Font update for placeholder
-                ctx.fillStyle = '#555'; ctx.font = '20px "Clash Grotesk", sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText("Upload a template to begin", 300, 200);
-            },
+if (finalImageUrl && finalImageUrl.startsWith('blob:')) {
+throw new Error("Image upload failed (Internal State: Blob URL). Please try re-selecting the image.");
+}
 
-            async updatePreview() {
-                if (!this.imgObj) return;
+const success = await window.saveGlobalSettings({
+templateUrl: finalImageUrl,
+config: this.state.config,
+lastUpdated: new Date().toISOString()
+});
 
-                // Update State from Inputs
-                this.state.config.name = {
-                    x: parseFloat(document.getElementById('name-x').value) || 0,
-                    y: parseFloat(document.getElementById('name-y').value) || 0,
-                    size: parseFloat(document.getElementById('name-size').value) || 10,
-                    color: document.getElementById('name-color').value || '#FFFFFF'
-                };
+if (success) {
+alert("Configuration Saved!");
+this.state.templateImage = finalImageUrl;
+} else {
+alert("Failed to save to database.");
+}
+} catch (e) {
+console.error(e);
+alert("Error: " + e.message);
+}
 
-                this.state.config.userPhoto = {
-                    x: parseFloat(document.getElementById('photo-x').value) || 0,
-                    y: parseFloat(document.getElementById('photo-y').value) || 0,
-                    width: parseFloat(document.getElementById('photo-w').value) || 100,
-                    height: parseFloat(document.getElementById('photo-h').value) || 100
-                };
+btn.disabled = false; btn.innerHTML = originalText;
+},
 
-                const canvas = document.getElementById('admin-canvas');
-                const ctx = canvas.getContext('2d');
+switchView(viewName) {
+document.getElementById('view-config').classList.add('hidden');
+document.getElementById('view-analytics').classList.add('hidden');
+document.getElementById(`view-${viewName}`).classList.remove('hidden');
 
-                // Resize canvas to match image
-                canvas.width = this.imgObj.width; 
-                canvas.height = this.imgObj.height;
+document.getElementById('nav-config').className = viewName === 'config' ? 'text-white font-medium hover:text-blue-400 transition' : 'text-gray-400 hover:text-blue-400 transition';
+document.getElementById('nav-analytics').className = viewName === 'analytics' ? 'text-white font-medium hover:text-blue-400 transition' : 'text-gray-400 hover:text-blue-400 transition';
 
-                // --- FONT PRE-LOADING (CRITICAL) ---
-                // We define the fonts we are about to use and wait for them.
-                const scaleFactor = canvas.width / 1000;
-                const nSize = this.state.config.name.size * (scaleFactor < 1 ? 1 : scaleFactor) * 1.5;
-                const nameFont = `600 ${nSize}px 'Clash Grotesk'`;
-                const guideFont = `bold 20px 'Clash Grotesk'`; // Matches the guide text
+if (viewName === 'analytics') this.loadAnalytics();
+},
 
-                try {
-                    // Force load both specific font instances
-                    const loads = [document.fonts.load(nameFont), document.fonts.load(guideFont)];
-                    await Promise.all(loads);
-                } catch(e) {
-                    console.warn("Font loading skipped or failed", e);
-                }
-                
-                // 1. Draw User Photo Placeholder (BEHIND Template)
-                const photo = this.state.config.userPhoto;
-                const px = (photo.x / 100) * canvas.width;
-                const py = (photo.y / 100) * canvas.height;
-                
-                // Center the box on the coordinate
-                const startX = px - (photo.width / 2);
-                const startY = py - (photo.height / 2);
+async loadAnalytics() {
+const tbody = document.getElementById('analytics-body');
+tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 py-8">Fetching records...</td></tr>';
 
-                // Draw solid box representing the photo
-                ctx.fillStyle = '#4ade80'; // Solid green
-                ctx.fillRect(startX, startY, photo.width, photo.height);
-                
-                // 2. Draw Template (Overlay)
-                ctx.drawImage(this.imgObj, 0, 0);
+if (window.fetchCards) {
+const result = await window.fetchCards();
+if (!result.success) {
+tbody.innerHTML = `<tr><td colspan="4" class="text-center text-red-500 py-8">Error: ${result.error}</td></tr>`;
+return;
+}
 
-                // 3. Draw Guides (ON TOP)
-                // Draw border so it's visible even if template is opaque
-                ctx.strokeStyle = '#ff0000'; // Red border for high visibility
-                ctx.lineWidth = 4;
-                ctx.strokeRect(startX, startY, photo.width, photo.height);
-                
-                // Draw 'Image' Text
-                ctx.fillStyle = '#ff0000';
-                ctx.font = guideFont; // Use the loaded font
-                ctx.textAlign = 'center';
-                ctx.fillText(`PHOTO AREA`, px, py);
-                ctx.font = '14px "Clash Grotesk", sans-serif';
-                ctx.fillText(`${photo.width}x${photo.height}`, px, py + 20);
+const cards = result.data;
+if (cards.length === 0) {
+tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 py-8">No records found.</td></tr>';
+return;
+}
 
-                // 4. Draw Name
-                const nameConf = this.state.config.name;
-                const nx = (nameConf.x / 100) * canvas.width;
-                const ny = (nameConf.y / 100) * canvas.height;
+tbody.innerHTML = cards.map(card => {
+const date = card.timestamp ? new Date(card.timestamp.seconds * 1000).toLocaleString() : 'N/A';
+const photoLink = card.userPhotoUrl
+? `<a href="${card.userPhotoUrl}" target="_blank" class="text-blue-400 hover:underline flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> View Photo</a>`
+: '<span class="text-gray-600">No Photo</span>';
 
-                ctx.font = nameFont; // Use the loaded font
-                ctx.fillStyle = nameConf.color;
-                ctx.textAlign = 'left';
-                ctx.fillText("User Name", nx, ny);
-                
-                // Draw helper crosshair for Name center
-                ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                ctx.beginPath();
-                ctx.arc(nx, ny, 3, 0, Math.PI*2);
-                ctx.fill();
-            }
-        };
+return `
+<tr>
+<td class="text-gray-400 text-sm">${date}</td>
+<td class="font-bold text-white text-lg">${card.name}</td>
+<td>${photoLink}</td>
+<td><a href="${card.imageUrl}" target="_blank" class="px-3 py-1 bg-blue-600/20 text-blue-400 rounded border border-blue-600/30 hover:bg-blue-600 hover:text-white transition text-xs font-bold">OPEN CARD</a></td>
+</tr>
+`;
+}).join('');
+}
+},
 
-        window.onload = () => adminApp.init();
-    </script>
+updateInputs() {
+document.getElementById('name-x').value = this.state.config.name.x;
+document.getElementById('name-y').value = this.state.config.name.y;
+document.getElementById('name-size').value = this.state.config.name.size;
+document.getElementById('name-color').value = this.state.config.name.color || '#FFFFFF';
+
+const photo = this.state.config.userPhoto || {x:50, y:40, width:200, height:200};
+document.getElementById('photo-x').value = photo.x;
+document.getElementById('photo-y').value = photo.y;
+document.getElementById('photo-w').value = photo.width;
+document.getElementById('photo-h').value = photo.height;
+},
+
+handleImageUpload(input) {
+const file = input.files[0];
+if (!file) return;
+
+if (this.state.templateImage && this.state.templateImage.startsWith('blob:')) {
+URL.revokeObjectURL(this.state.templateImage);
+}
+
+this.state.templateFile = file;
+this.state.templateImage = URL.createObjectURL(file);
+
+document.getElementById('upload-label').innerText = file.name;
+this.loadAndDrawImage();
+},
+
+loadAndDrawImage() {
+this.imgObj = new Image();
+this.imgObj.crossOrigin = "Anonymous";
+this.imgObj.src = this.state.templateImage;
+this.imgObj.onload = () => this.updatePreview();
+this.imgObj.onerror = () => {
+console.error("Could not load image. It might be a broken URL.");
+};
+},
+
+async updatePreview() {
+if (!this.imgObj) return;
+
+this.state.config.name = {
+x: parseFloat(document.getElementById('name-x').value) || 0,
+y: parseFloat(document.getElementById('name-y').value) || 0,
+size: parseFloat(document.getElementById('name-size').value) || 10,
+color: document.getElementById('name-color').value || '#FFFFFF'
+};
+
+this.state.config.userPhoto = {
+x: parseFloat(document.getElementById('photo-x').value) || 0,
+y: parseFloat(document.getElementById('photo-y').value) || 0,
+width: parseFloat(document.getElementById('photo-w').value) || 100,
+height: parseFloat(document.getElementById('photo-h').value) || 100
+};
+
+const canvas = document.getElementById('admin-canvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = this.imgObj.width;
+canvas.height = this.imgObj.height;
+
+const scaleFactor = canvas.width / 1000;
+const nSize = this.state.config.name.size * (scaleFactor < 1 ? 1 : scaleFactor) * 1.5;
+const nameFont = `600 ${nSize}px 'Clash Grotesk'`;
+const guideFont = `bold 20px 'Clash Grotesk'`;
+
+try {
+const loads = [document.fonts.load(nameFont), document.fonts.load(guideFont)];
+await Promise.all(loads);
+} catch(e) {
+console.warn("Font loading skipped or failed", e);
+}
+
+// 1. Draw User Photo Placeholder (BEHIND)
+const photo = this.state.config.userPhoto;
+const px = (photo.x / 100) * canvas.width;
+const py = (photo.y / 100) * canvas.height;
+const startX = px - (photo.width / 2);
+const startY = py - (photo.height / 2);
+
+ctx.fillStyle = '#4ade80';
+ctx.fillRect(startX, startY, photo.width, photo.height);
+
+// 2. Draw Template
+ctx.drawImage(this.imgObj, 0, 0);
+
+// 3. Draw Guides
+ctx.strokeStyle = '#ff0000';
+ctx.lineWidth = 4;
+ctx.strokeRect(startX, startY, photo.width, photo.height);
+
+ctx.fillStyle = '#ff0000';
+ctx.font = guideFont;
+ctx.textAlign = 'center';
+ctx.fillText(`PHOTO AREA`, px, py);
+ctx.font = '14px "Clash Grotesk", sans-serif';
+ctx.fillText(`${photo.width}x${photo.height}`, px, py + 20);
+
+// 4. Draw Name
+const nameConf = this.state.config.name;
+const nx = (nameConf.x / 100) * canvas.width;
+const ny = (nameConf.y / 100) * canvas.height;
+
+ctx.font = nameFont;
+ctx.fillStyle = nameConf.color;
+ctx.textAlign = 'left';
+ctx.fillText("User Name", nx, ny);
+
+ctx.fillStyle = 'rgba(255,255,255,0.5)';
+ctx.beginPath();
+ctx.arc(nx, ny, 3, 0, Math.PI*2);
+ctx.fill();
+}
+};
+
+window.onload = () => adminApp.init();
+</script>
 </body>
 </html>
