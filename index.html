@@ -96,7 +96,7 @@ Save Configuration
 <div class="relative w-full flex justify-center overflow-auto">
 <canvas id="admin-canvas" class="max-w-full h-auto shadow-2xl rounded-lg border border-gray-800"></canvas>
 </div>
-<p class="text-xs text-gray-500 mt-4 text-center">The green box repents where the user's photo will be placed.</p>
+<p class="text-xs text-gray-500 mt-4 text-center">The green box represents where the user's photo will be placed.</p>
 </div>
 </div>
 
@@ -108,7 +108,7 @@ Save Configuration
 <h2 class="text-2xl font-bold text-white">Generated Cards</h2>
 <p class="text-gray-400 text-sm mt-1">Real-time database records (Collection: sanad)</p>
 </div>
-<button onclick="adminApp.loadAnalytics()" class="text-sm bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded text-white transition">Refh Data</button>
+<button onclick="adminApp.loadAnalytics()" class="text-sm bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded text-white transition">Refresh Data</button>
 </div>
 <div class="overflow-x-auto">
 <table class="analytics-table">
@@ -130,7 +130,7 @@ Save Configuration
 <!-- Firebase SDKs -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getFitore, collection, getDocs, getDoc, setDoc, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-fitore.js";
+import { getFirestore, collection, getDocs, getDoc, setDoc, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
 // MVS Project Config
@@ -146,7 +146,7 @@ measurementId: "G-EZ8WTRXK93"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFitore(app);
+const db = getFirestore(app);
 
 // Helper to ensure auth before DB ops
 const ensureAuth = async () => {
@@ -164,7 +164,7 @@ await signInAnonymously(auth);
 return true;
 } catch (e) {
 console.error("Auth Failure:", e);
-if (e.code === 'auth/admin-tricted-operation' || e.message.includes('admin-tricted-operation')) {
+if (e.code === 'auth/admin-restricted-operation' || e.message.includes('admin-restricted-operation')) {
 const msg = "Firebase Error: Anonymous Auth is disabled. Please enable it in Firebase Console > Authentication > Sign-in method.";
 console.error(msg);
 alert(msg);
@@ -519,4 +519,3 @@ window.onload = () => adminApp.init();
 </script>
 </body>
 </html>
-
